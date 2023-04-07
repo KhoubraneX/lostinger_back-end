@@ -17,4 +17,9 @@
         http_response_code(422);
         echo json_encode(["message"=> "The given data was invalid." , "errors" => $errors]);
     }
+
+    function checkAuth() {
+        $auth = new UserGateway;
+        if ($auth->authAccessToken() === false) exit;
+    }
 ?>

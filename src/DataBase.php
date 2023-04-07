@@ -31,12 +31,12 @@
 
         public function fetchAll($data): array | null {
             $data = mysqli_fetch_all($data , MYSQLI_ASSOC);
-            return isset($data) ? $data : notFound();
+            return $data;
         }
 
         public function fetch($data): array | null {
             $data = mysqli_fetch_assoc($data);
-            return isset($data) ? $data : notFound();
+            return $data;
         }
         
 
