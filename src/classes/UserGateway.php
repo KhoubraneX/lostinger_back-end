@@ -1,7 +1,9 @@
 <?php
-    class UserGateway extends DataBase {
-        public function login() {
 
+    class UserGateway extends DataBase {
+        
+        public function login() {
+            
             $data = json_decode(file_get_contents("php://input") , true);
 
             if (!isset($data['email']) || !isset($data['password'])){
@@ -37,8 +39,9 @@
                 exit;
             }
 
-            $query = "SELECT _id , name , password FROM user WHERE email = '$email'";
-            $user = $this->executeQuery($query);
+            $sql = "SELECT _id , name , password FROM user WHERE email = '$email'";
+            $user = $this->executeQuery($sql);
+
 
             if (mysqli_num_rows($user) === 0) {
                 $response = array(
@@ -86,24 +89,10 @@
                 echo json_encode(["message" => "Unauthorized"]);
                 return false;
             }
-
-            $accessToken = base64_decode(str_replace('_', '/', str_replace('-','+',explode('.', $matches[1])[1])));
-
-            if ($accessToken === false) {
-                http_response_code(400);
-                echo json_encode(["message" => "Unauthorized"]);
-                return false;
-            }
             
-            $data = json_decode($accessToken , true);
-            
-            if ($data === null) {
-                http_response_code(400);
-                echo json_encode(["message" => "invalid Json"]);
-                return false;
-            }
-
-            return $data;
+            $JWTcode = new JWTCodec;
+            $decoded = $JWTcode->decode($matches[1]);
+            return $decoded["_id"];
         }
     }
 ?>

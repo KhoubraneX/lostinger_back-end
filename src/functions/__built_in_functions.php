@@ -21,5 +21,6 @@
     function checkAuth() {
         $auth = new UserGateway;
         if ($auth->authAccessToken() === false) exit;
+        return $auth->authAccessToken();
     }
 ?>

@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit8057895ae11c4c98bfa77baa04b845da
+class ComposerStaticInita43e2bdd14f8cac903a31d1bb4d3b3b3
 {
     public static $files = array (
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
@@ -26,6 +26,10 @@ class ComposerStaticInit8057895ae11c4c98bfa77baa04b845da
         'G' => 
         array (
             'GrahamCampbell\\ResultType\\' => 26,
+        ),
+        'F' => 
+        array (
+            'Firebase\\JWT\\' => 13,
         ),
         'D' => 
         array (
@@ -54,6 +58,10 @@ class ComposerStaticInit8057895ae11c4c98bfa77baa04b845da
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
         ),
+        'Firebase\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
+        ),
         'Dotenv\\' => 
         array (
             0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
@@ -76,10 +84,10 @@ class ComposerStaticInit8057895ae11c4c98bfa77baa04b845da
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit8057895ae11c4c98bfa77baa04b845da::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit8057895ae11c4c98bfa77baa04b845da::$prefixDirsPsr4;
-            $loader->fallbackDirsPsr4 = ComposerStaticInit8057895ae11c4c98bfa77baa04b845da::$fallbackDirsPsr4;
-            $loader->classMap = ComposerStaticInit8057895ae11c4c98bfa77baa04b845da::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInita43e2bdd14f8cac903a31d1bb4d3b3b3::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInita43e2bdd14f8cac903a31d1bb4d3b3b3::$prefixDirsPsr4;
+            $loader->fallbackDirsPsr4 = ComposerStaticInita43e2bdd14f8cac903a31d1bb4d3b3b3::$fallbackDirsPsr4;
+            $loader->classMap = ComposerStaticInita43e2bdd14f8cac903a31d1bb4d3b3b3::$classMap;
 
         }, null, ClassLoader::class);
     }

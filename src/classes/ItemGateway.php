@@ -5,16 +5,18 @@
             $data = $this->fetchAll($data);
             print_r(json_encode($data));
         }
+
         public function getItem(string $id) {
-            $data = $this->executeQuery("SELECT * FROM `item` WHERE _idItem = '$id'");
-            $data = $this->fetch($data);
-            isset($data) && print_r(json_encode($data));
+            $fetch = $this->executeQuery("SELECT * FROM `item` WHERE _idItem = '$id'");
+            $data = $this->fetch($fetch);
+            mysqli_num_rows($fetch) != 0 ? print_r(json_encode($data)) : notFound();
         }
-        public function addItem() {
+
+        public function addItem($userId) {
             $data = json_decode(file_get_contents("php://input") , true);
             //
             $_idItem = uniqueID("item_");
-            $_idUser = $data['_idUser'];
+            $_idUser = $userId;
             $nameItem = $data['nameItem'];
             $description = $data['description'];
             $location = $data['location'];
@@ -59,8 +61,8 @@
             $res ? print_r(json_encode(["id" => $id , "message" => "updated successfully" ])) : print_r(json_encode(["message" => "faild"]));
         }
 
-        public function deleteItem(string $id) {
-            $this->executeQuery("DELETE FROM `item` WHERE _idItem = '$id'");
+        public function deleteItem(string $id , $userId) {
+            $this->executeQuery("DELETE FROM `item` WHERE _idItem = '$id' and _idUser = '$userId'");
             mysqli_affected_rows($this->connection) > 0 ? print_r(json_encode(array("message" => "deleted successfully"))) : notFound();
         }
     }

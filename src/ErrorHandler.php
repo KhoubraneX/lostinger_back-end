@@ -11,7 +11,7 @@
         
         public static function handleException(Throwable $ex): void {
             echo json_encode([
-                "errorMsg" => $ex->getMessage(),
+                "errorMsg" => $ex->getMessage() . " line " . $ex->getLine(),
             ]);
         }
     }

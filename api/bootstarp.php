@@ -1,6 +1,8 @@
 <?php
-require dirname(__DIR__) . "/vendor/autoload.php";
+require_once  dirname(__DIR__) . "/vendor/autoload.php";
 require dirname(__DIR__) . "/src/functions/__built_in_functions.php";
+require dirname(__DIR__) . "/src/util/JWTCodec.php";
+require dirname(__DIR__) . "/src/classes/ItemGateway.php";
 require dirname(__DIR__) . "/src/classes/UserGateway.php";
 
 // handel errors by json format

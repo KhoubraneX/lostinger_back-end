@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . "\bootstarp.php";
+require dirname(__DIR__) . "/api/bootstarp.php";
 
 $path = explode("/" , parse_url($_SERVER["REQUEST_URI"] , PHP_URL_PATH));
 
@@ -15,7 +15,7 @@ if ($resource !== "items" && $resource !== "auth") {
 
 switch ($resource) {
     case 'items':
-        $controller = new ItemController;
+        $controller = new ItemController(0);
         $controller->processRequest($method , $id);
         break;
     case 'auth':

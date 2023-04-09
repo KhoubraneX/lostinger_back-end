@@ -1,16 +1,17 @@
 <?php
-    require dirname(__DIR__) . "/src/classes/ItemGateway.php";
 
-    class ItemController extends ItemGateway {
-        public function processRequest(string $method , ?string $id): void {
-            if ($id === null) {
+class ItemController extends ItemGateway {
+
+    public function processRequest(string $method , ?string $id): void {
+        if ($id === null) {
                 switch ($method) {
                     case 'GET':
                         $this->getItems();
                         break;
-
+                        
                     case 'POST':
-                        $this->addItem();
+                        $userId = checkAuth();
+                        $this->addItem($userId);
                         break;
                     
                     default:
@@ -21,16 +22,16 @@
                 $id = htmlspecialchars($id);
                 switch ($method) {
                     case 'GET':
-                        checkAuth();
                         $this->getItem($id);
                         break;
-
-                    case 'PATCH':
-                        $this->updateItem($id);
-                        break;
-
-                    case 'DELETE':
-                        $this->deleteItem($id);
+                        
+                        case 'PATCH':
+                            $userId = checkAuth();
+                            $this->updateItem($userId);
+                            break;
+                        case 'DELETE':
+                            $userId = checkAuth();
+                            $this->deleteItem($id , $userId);
                         break;
                     
                     default:
