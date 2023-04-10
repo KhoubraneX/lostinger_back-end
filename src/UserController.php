@@ -6,6 +6,9 @@
                 case 'login':
                     $this->login();
                     break;
+                case 'logout':
+                    $this->logout();
+                    break;
                 case 'refresh':
                     $this->refreshAccessToken();
                     break;
