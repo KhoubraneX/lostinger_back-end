@@ -6,11 +6,13 @@
     function notFound(): void {
         http_response_code(404);
         print_r(json_encode(["message" => "Not Found"]));
+        exit;
     }
 
     function notAllodMethods(string $allowed_method) {
         http_response_code("405");
         header("Allow: {$allowed_method}");
+        exit;
     }
     
     function unprocessableContent(array $errors) {

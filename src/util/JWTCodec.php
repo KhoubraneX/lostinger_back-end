@@ -29,7 +29,24 @@
             } catch (Exception $e) {
                 // Return an error response
                 http_response_code(400);
-                echo json_encode(["message" => "Token is invalid" . $e]);
+                echo json_encode(["message" => "Token is invalid"]);
+                exit;
+            }
+        }
+
+        public function decode_ref(string $jwt) {
+            try {
+                // Verify and decode the JWT token
+                $decoded = JWT::decode($jwt, new Key($this->key, 'HS256'));
+            
+                // Access the payload data
+                $user_id = $decoded->sub;
+                return ["_id" => $user_id ];
+
+            } catch (Exception $e) {
+                // Return an error response
+                http_response_code(400);
+                echo json_encode(["message" => "Token is invalid"]);
                 exit;
             }
         }

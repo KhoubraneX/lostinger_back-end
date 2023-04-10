@@ -27,8 +27,9 @@ class ItemController extends ItemGateway {
                         
                         case 'PATCH':
                             $userId = checkAuth();
-                            $this->updateItem($userId);
+                            $this->updateItem($id , $userId);
                             break;
+
                         case 'DELETE':
                             $userId = checkAuth();
                             $this->deleteItem($id , $userId);

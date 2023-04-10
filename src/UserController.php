@@ -1,18 +1,18 @@
 <?php
     class UserController extends UserGateway {
         public function processRequest(string $method , ?string $id): void {
-            if ($id === "login") {
-                $id = htmlspecialchars($id);
-                //
-                    if ($method === "POST") {
-                        $this->login();
-                    } else {
-                        notAllodMethods("POST");
-                    }
-                //
-                } else {
-                    notFound();
-                }
+            if ($method !== "POST") notAllodMethods("POST");
+            switch ($id) {
+                case 'login':
+                    $this->login();
+                    break;
+                case 'refresh':
+                    $this->refreshAccessToken();
+                    break;
+                default:
+                notFound();
+                    break;
             }
         }
+    }
 ?>

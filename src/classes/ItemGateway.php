@@ -36,10 +36,10 @@
                             VALUES ('$_idItem' , '$_idUser', '$nameItem', '$description', '$location', '$date', '$_idPlace', '$_idCategory', '$brand', '$_idType', '$_idStatus')";
             $res = $this->executeQuery($sql);
             //
-            $res ? print_r(json_encode(["id" => $_idItem , "message" => "success" ])) : print_r(json_encode(["message" => "faild"]));
+            mysqli_affected_rows($this->connection) > 0 ? print_r(json_encode(["id" => $_idItem , "message" => "success" ])) : print_r(json_encode(["message" => "faild"]));
         }
 
-        public function updateItem(string $id) {
+        public function updateItem(string $id , int $userId) {
             $data = json_decode(file_get_contents("php://input") , true);
             //
             if (sizeof($data) === 0) return;
@@ -55,10 +55,10 @@
                 $sql .= "$col='$val', ";
             }
             $sql = rtrim($sql, ", ");
-            $sql .= " WHERE _idItem = '$id';";
+            $sql .= " WHERE _idItem = '$id' AND _idUser = '$userId';";
             //
             $res = $this->executeQuery($sql);
-            $res ? print_r(json_encode(["id" => $id , "message" => "updated successfully" ])) : print_r(json_encode(["message" => "faild"]));
+            mysqli_affected_rows($this->connection) > 0 ? print_r(json_encode(["id" => $id , "message" => "updated successfully" ])) : print_r(json_encode(["message" => "faild"]));
         }
 
         public function deleteItem(string $id , $userId) {
