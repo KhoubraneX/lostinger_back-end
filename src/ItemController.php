@@ -24,7 +24,7 @@ class ItemController extends ItemGateway {
                     case 'GET':
                         $this->getItem($id);
                         break;
-                        
+
                         case 'PATCH':
                             $userId = checkAuth();
                             $this->updateItem($id , $userId);

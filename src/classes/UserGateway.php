@@ -95,7 +95,7 @@
                 exit;
             }
             
-            if (strlen($name) < 4) {
+            if (strlen($name) < 3) {
                 $response = array(
                     'status' => 'error',
                     'message' => 'name must contain at least 4 characters'
@@ -121,7 +121,7 @@
                 echo json_encode($response);
                 http_response_code(401);
                 exit;
-            } else if (strlen($password) > 15) {
+            } else if (strlen($password) > 20) {
                 $response = array(
                     'status' => 'error',
                     'message' => 'Password must less than 15'
