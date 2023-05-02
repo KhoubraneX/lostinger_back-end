@@ -6,7 +6,7 @@ class ItemDetailsController extends ItemDetailsGateway {
         if ($id === null) {
                 switch ($method) {
                     case 'GET':
-                        $this->ProvideItemDetails();
+                        $this->provideItemDetails();
                         break;
                     
                     default:
@@ -14,7 +14,17 @@ class ItemDetailsController extends ItemDetailsGateway {
                         break;
                 }
         } else {
-            // 
+            switch ($method) {
+                case 'GET':
+                    if ($id === "usedBrand") {
+                        $this->provideMostUsedBrand();
+                    }
+                    break;
+                
+                default:
+                    notAllodMethods("GET");
+                    break;
+            }
         }
     }
 }

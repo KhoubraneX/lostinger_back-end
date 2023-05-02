@@ -18,7 +18,7 @@ $resource = $path[3];
 $id = $path[4] ?? null;
 $method = $_SERVER["REQUEST_METHOD"];
 
-if ($resource !== "items" && $resource !== "auth" && $resource !== "itemDetails") {
+if ($resource !== "items" && $resource !== "auth" && $resource !== "itemDetails" && $resource !== "blogs") {
     notFound();
     exit;
 }
@@ -30,6 +30,10 @@ switch ($resource) {
         break;
     case 'itemDetails':
         $controller = new ItemDetailsController;
+        $controller->processRequest($method , $id);
+        break;
+    case 'blogs':
+        $controller = new BlogController;
         $controller->processRequest($method , $id);
         break;
     case 'auth':

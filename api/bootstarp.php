@@ -5,6 +5,7 @@ require dirname(__DIR__) . "/src/util/JWTCodec.php";
 require dirname(__DIR__) . "/src/classes/ItemGateway.php";
 require dirname(__DIR__) . "/src/classes/ItemDetailsGateway.php";
 require dirname(__DIR__) . "/src/classes/UserGateway.php";
+require dirname(__DIR__) . "/src/classes/BlogGateway.php";
 
 // handel errors by json format
 set_error_handler("ErrorHandler::handleError");

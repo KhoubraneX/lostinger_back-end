@@ -1,6 +1,48 @@
 <?php
 class ItemGateway extends DataBase
 {
+    public function getSimilarItem()
+    {
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($data['_idItem'], $data['nameCategorie'])) {
+            http_response_code(422);
+            echo json_encode(["message" => "All fields required"]);
+            exit;
+        }
+
+        $idItem = htmlspecialchars($data['_idItem']);
+        $Category = htmlspecialchars($data['nameCategorie']);
+
+        $sql = "SELECT _idItem, 
+        nameItem, 
+        description, 
+        location, 
+        img, 
+        date, 
+        brand, 
+        nameCategorie, 
+        nameStatus, 
+        nameType, 
+        namePlace
+    FROM item
+    INNER JOIN item_category USING(_idCategory) 
+    INNER JOIN item_status USING(_idStatus) 
+    INNER JOIN item_type USING(_idType) 
+    INNER JOIN item_place USING(_idPlace)
+        WHERE _idItem != '$idItem'
+            AND nameCategorie = '$Category'
+               ";
+
+        $data = $this->executeQuery($sql);
+        $data = $this->fetch($data);
+
+        if (isset($data['img']) && !empty($data['img'])) {
+            $data['img'] = "http://" . $_SERVER['HTTP_HOST'] . "/space/img/items/" . $data['img'];
+        }
+
+        print_r(json_encode($data));
+    }
     public function getItems()
     {
         $data = $this->executeQuery("SELECT 
@@ -26,9 +68,50 @@ class ItemGateway extends DataBase
           ");
         $data = $this->fetchAll($data);
 
-        foreach($data as &$item) { // use reference &$item to update the original array
-            if(isset($item['img']) && !empty($item['img'])) {
-                $item['img'] = "http://" . $_SERVER['HTTP_HOST'] . "/space/img/items/" . $item['img'] ;
+        foreach ($data as &$item) { // use reference &$item to update the original array
+            if (isset($item['img']) && !empty($item['img'])) {
+                $item['img'] = "http://" . $_SERVER['HTTP_HOST'] . "/space/img/items/" . $item['img'];
+            }
+        }
+
+        print_r(json_encode($data));
+    }
+
+    public function getItemsNear($city)
+    {
+        $data = $this->executeQuery("SELECT 
+            _idItem, 
+            _idUser, 
+            nameItem, 
+            description, 
+            location, 
+            img, 
+            creatAt, 
+            date, 
+            brand, 
+            nameCategorie, 
+            nameStatus, 
+            nameType, 
+            namePlace
+        FROM 
+            `item` 
+            INNER JOIN item_category USING(_idCategory) 
+            INNER JOIN item_status USING(_idStatus) 
+            INNER JOIN item_type USING(_idType) 
+            INNER JOIN item_place USING(_idPlace)
+            WHERE location like '%$city%'
+        ");
+
+        // if there is no data match in that city
+        if (mysqli_num_rows($data) < 1) {
+            $this->getItems();
+            exit;
+        }
+
+        $data = $this->fetchAll($data);
+        foreach ($data as &$item) { // use reference &$item to update the original array
+            if (isset($item['img']) && !empty($item['img'])) {
+                $item['img'] = "http://" . $_SERVER['HTTP_HOST'] . "/space/img/items/" . $item['img'];
             }
         }
 
@@ -66,8 +149,8 @@ class ItemGateway extends DataBase
         $data = $this->fetch($fetch);
 
         mysqli_num_rows($fetch) === 0 && notFound();
-            if (isset($data['img']) && !empty($data['img'])) {
-                $data['img'] = "http://" . $_SERVER['HTTP_HOST'] . "/space/img/items/" . $data['img'] ;
+        if (isset($data['img']) && !empty($data['img'])) {
+            $data['img'] = "http://" . $_SERVER['HTTP_HOST'] . "/space/img/items/" . $data['img'];
         }
 
         print_r(json_encode($data));
@@ -159,16 +242,16 @@ class ItemGateway extends DataBase
 
     private function checkItemData($nameItem, $description, $location, $brand, $date, $_idPlace, $_idCategory, $_idType)
     {
-        if (!preg_match("/^[A-Za-z0-9 ]{1,24}$/", $nameItem)) {
+        if (!preg_match("/^.{1,24}$/", $nameItem)) {
             unprocessableContent(["name" => "name most be between 1 and 25 characters long"]);
         }
-        if (!preg_match("/^[A-Za-z0-9 ]{1,255}$/", $description)) {
+        if (!preg_match("/^.{1,255}$/", $description)) {
             unprocessableContent(["description" => "description most be between 1 and 255 characters long"]);
         }
-        if (!preg_match("/^[A-Za-z0-9 ]{1,100}$/", $location)) {
+        if (!preg_match("/^.{1,100}$/", $location)) {
             unprocessableContent(["location" => "location is not valid"]);
         }
-        if (!preg_match("/^[A-Za-z0-9 ]{1,20}$/", $brand)) {
+        if (!preg_match("/^.{1,20}$/", $brand)) {
             unprocessableContent(["brand" => "brand most be brand between 1 and 10 characters long"]);
         }
         if (!isset($date) || !empty($date)) {

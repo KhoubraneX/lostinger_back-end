@@ -1,25 +1,23 @@
 <?php
 
-class ItemController extends ItemGateway {
+class BlogController extends BlogGateway {
 
     public function processRequest(string $method , ?string $id): void {
         if ($id === null) {
                 switch ($method) {
                     case 'GET':
-                        {
-                            $this->getItems();
-                        }
+                            $this->getBlogs();
                         break;
-                        
+
                     case 'POST':
-                        if (isset($_GET["target"]) && $_GET["target"] === "similarItem") {
-                            $this->getSimilarItem();
+                        if (isset($_GET["target"]) && $_GET["target"] === "similarBlogs") {
+                            $this->getSimilarBlogs();
                         } else {
                             $userId = checkAuth();
-                            $this->addItem($userId);
+                            $this->addBlog($userId);
                         }
-                        break;
-                    
+                    break;
+
                     default:
                         notAllodMethods("GET , POST");
                         break;
@@ -28,21 +26,17 @@ class ItemController extends ItemGateway {
                 $id = htmlspecialchars($id);
                 switch ($method) {
                     case 'GET':
-                        if ($id === "search" && isset($_GET["city"])) {
-                            $this->getItemsNear($_GET["city"]);
-                        } else {
-                            $this->getItem($id);
-                        }
+                            $this->getBlog($id);
                         break;
 
                         case 'PATCH':
                             $userId = checkAuth();
-                            $this->updateItem($id , $userId);
+                            $this->updateBlog($id , $userId);
                             break;
 
                         case 'DELETE':
                             $userId = checkAuth();
-                            $this->deleteItem($id , $userId);
+                            $this->deleteBlog($id , $userId);
                         break;
                     
                     default:
@@ -52,5 +46,3 @@ class ItemController extends ItemGateway {
             }
         }
     }
-
-?>
