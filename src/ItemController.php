@@ -6,7 +6,10 @@ class ItemController extends ItemGateway {
         if ($id === null) {
                 switch ($method) {
                     case 'GET':
-                        {
+                        if (isset($_GET["target"]) && $_GET["target"] == "myItems") {
+                            $userId = checkAuth();
+                            $this->getItemsByid($userId);
+                        } else {
                             $this->getItems();
                         }
                         break;

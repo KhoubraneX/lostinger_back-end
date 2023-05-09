@@ -1,6 +1,40 @@
 <?php
 class ItemGateway extends DataBase
 {
+
+    public function getItemsByid($userId) {
+        $data = $this->executeQuery("SELECT 
+            _idItem, 
+            _idUser, 
+            nameItem, 
+            description, 
+            location, 
+            img, 
+            creatAt, 
+            date, 
+            brand, 
+            nameCategorie, 
+            nameStatus, 
+            nameType, 
+            namePlace
+          FROM 
+            `item` 
+            INNER JOIN item_category USING(_idCategory) 
+            INNER JOIN item_status USING(_idStatus) 
+            INNER JOIN item_type USING(_idType) 
+            INNER JOIN item_place USING(_idPlace)
+            WHERE  _idUser = '$userId'
+          ");
+        $data = $this->fetchAll($data);
+
+        foreach ($data as &$item) { // use reference &$item to update the original array
+            if (isset($item['img']) && !empty($item['img'])) {
+                $item['img'] = "http://" . $_SERVER['HTTP_HOST'] . "/space/img/items/" . $item['img'];
+            }
+        }
+
+        print_r(json_encode($data));
+    }
     public function getSimilarItem()
     {
         $data = json_decode(file_get_contents("php://input"), true);
