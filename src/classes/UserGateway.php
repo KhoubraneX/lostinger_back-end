@@ -1,8 +1,116 @@
 <?php
 
     class UserGateway extends DataBase {
+        public function getUserDetails($userId) {
+            $sql =  "SELECT _id,
+            name,
+            email,
+            phone
+                FROM user WHERE _id = '$userId'" ;
+            $user = $this->executeQuery($sql);
+            $user = $this->fetch($user);
+                
+            echo(json_encode($user));
+        }
+
+        public function UpdateUser($userId) {
+            $data = json_decode(file_get_contents("php://input") , true);
+
+            if (isset($data["name"]) && isset($data["phone"])) {
+                $name = $data["name"];
+                $phone = $data["phone"];
+                
+                // check name
+                if (strlen($name) < 3) {
+                    $response = array(
+                        'status' => 'error',
+                        'message' => 'name must contain at least 4 characters'
+                    );
+                    echo json_encode($response);
+                    http_response_code(401);
+                    exit;
+                } else if (strlen($name) > 15) {
+                    $response = array(
+                        'status' => 'error',
+                        'message' => 'name must less than 15 characters'
+                    );
+                    echo json_encode($response);
+                    http_response_code(401);
+                    exit;
+                }
+
+                // check phone
+                if (!preg_match('/^((06)|(07))[0-9]{8}$/' , $phone) && $phone !== "") {
+                    http_response_code(401);
+                    echo json_encode(["message" => "invalid phone"]);
+                    exit;
+                }
+
+                // update user
+                $sql = "UPDATE user
+                SET name = '$name' , phone = '$data[phone]'
+                WHERE _id = '$userId';";
+
+                $this->executeQuery($sql);
+                mysqli_affected_rows($this->connection) > 0 && print_r(json_encode(["message" => "updated successfully"]));
+
+            } else if (isset($data["oldPassword"]) && isset($data["newPassword"])) {
+                $newPassword = $data["newPassword"];
+                $oldPassword = $data["oldPassword"];
+
+                // check old password
+                $sql = "SELECT password FROM user WHERE _id = '$userId'";
+                $user = $this->executeQuery($sql);
+                $user = $this->fetch($user);
+                
+                $password_hash = $user["password"];
+                if (!password_verify($oldPassword , $password_hash)){
+                    $response = array(
+                        'status' => 'error',
+                        'message' => "current password incorrect."
+                    );
+                    http_response_code(401);
+                    echo json_encode($response);
+                    exit;
+                }
+
+                // check new password
+                if (strlen($newPassword) < 8) {
+                    $response = array(
+                        'status' => 'error',
+                        'message' => 'Password must contain at least 8 characters'
+                    );
+                    echo json_encode($response);
+                    http_response_code(401);
+                    exit;
+                } else if (strlen($newPassword) > 20) {
+                    $response = array(
+                        'status' => 'error',
+                        'message' => 'Password must less than 15'
+                    );
+                    echo json_encode($response);
+                    http_response_code(401);
+                    exit;
+                }
+
+                $regPasswordHash = password_hash($newPassword , PASSWORD_DEFAULT);
+                
+                $sql = "UPDATE user
+                SET password = '$regPasswordHash'
+                WHERE _id = '$userId';";
+
+                $this->executeQuery($sql);
+                mysqli_affected_rows($this->connection) > 0 && print_r(json_encode(["message" => "updated successfully"]));
+
+            }
+            else {
+                print_r(json_encode(["message" => "all fields required"]));
+                http_response_code(422);
+                exit;
+            }
+        }
+
         public function login() {
-            
             $data = json_decode(file_get_contents("php://input") , true);
 
             if (!isset($data['email']) || !isset($data['password'])){
