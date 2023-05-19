@@ -16,7 +16,7 @@ function imgToUrl($img): string
     $imageInfo = getimagesizefromstring($image);
 
     // Determine the extension of the image based on the MIME type
-    $mime = $imageInfo['mime'];
+    // $mime = $imageInfo['mime'];
     $extension = image_type_to_extension($imageInfo[2]);
 
     // Generate a unique filename for the image
@@ -61,3 +61,5 @@ function checkAuth()
     if ($auth->authAccessToken() === false) exit;
     return $auth->authAccessToken();
 }
+
+

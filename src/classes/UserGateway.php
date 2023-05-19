@@ -273,7 +273,10 @@
 
         private function SendJwtByEmail(string $email)
         {
-            $sql = "SELECT _id , name , password FROM user WHERE email = '$email'";
+            $sql = "SELECT u._id, u.name, u.password, ur.nameRole
+            FROM user u
+            INNER JOIN user_role ur
+                ON u._idRole = ur._idRole WHERE email = '$email';";
             $user = $this->executeQuery($sql);
             $user = $this->fetch($user);
             
@@ -281,6 +284,7 @@
                 "sub" => $user["_id"],
                 "name" =>  $user["name"],
                 "email" => $email,
+                "role" => $user["nameRole"],
                 "exp" => time() + 1800
             ];
 
@@ -334,7 +338,10 @@
         }
 
         public function getUserByid(int $id) {
-            $sql = "SELECT _id , name , email FROM user WHERE _id = '$id'";
+            $sql = "SELECT u._id, u.name, u.email, u.password, ur.nameRole
+            FROM user u
+            INNER JOIN user_role ur
+                ON u._idRole = ur._idRole WHERE _id = '$id';";
             $user = $this->executeQuery($sql);
             return $user;
         }
@@ -393,6 +400,7 @@
                 "sub" => $user["_id"],
                 "name" =>  $user["name"],
                 "email" => $user["email"],
+                "role" => $user["nameRole"],
                 "exp" => time() + 1800
             ];
             $exp_ref = time() + 604800;

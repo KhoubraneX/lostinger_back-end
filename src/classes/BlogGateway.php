@@ -1,5 +1,6 @@
 <?php
-class BlogGateway extends DataBase {
+class BlogGateway extends DataBase
+{
     public function getSimilarBlogs()
     {
         $data = json_decode(file_get_contents("php://input"), true);
@@ -26,7 +27,8 @@ class BlogGateway extends DataBase {
         print_r(json_encode($data));
     }
 
-    public function getBlogs() {
+    public function getBlogs()
+    {
         $data = $this->executeQuery("SELECT * FROM `blog`");
         $data = $this->fetchAll($data);
 
@@ -60,13 +62,13 @@ class BlogGateway extends DataBase {
         $this->checkIfAdmin($userId);
 
         $data = json_decode(file_get_contents("php://input"), true);
-        if (!isset($data['title'], $data['description'] , $data['img'])) {
+        if (!isset($data['title'], $data['description'], $data['img'])) {
             http_response_code(422);
             echo json_encode(["message" => "All fields required"]);
             exit;
         }
         //
-        
+
         $_idBlog = uniqueID("blog_");
         $img = $data['img'];
         $title = htmlspecialchars($data['title']);
@@ -78,8 +80,8 @@ class BlogGateway extends DataBase {
             $img  = imgToUrl($img);
         }
         //
-        $sql = "INSERT INTO blog(_idBlog , title , description , img) 
-                            VALUES ('$_idBlog' , '$title' , '$description' , '$img')";
+        $sql = "INSERT INTO blog(_idBlog , _idUser , title , description , img) 
+                            VALUES ('$_idBlog' , '$userId' , '$title' , '$description' , '$img')";
         $res = $this->executeQuery($sql);
         //
         mysqli_affected_rows($this->connection) > 0 ? print_r(json_encode(["id" => $_idBlog, "message" => "success"])) : print_r(json_encode(["message" => "faild"]));
@@ -88,21 +90,59 @@ class BlogGateway extends DataBase {
     public function updateBlog(string $id, int $userId)
     {
         $data = json_decode(file_get_contents("php://input"), true);
-
+        
+        
         if (isset($data['like'])) {
             $sql = "UPDATE blog SET likeCounte = likeCounte + 1 WHERE _idBlog = '$id';";
             $this->executeQuery($sql);
             mysqli_affected_rows($this->connection) > 0 ? print_r(json_encode(["id" => $id, "message" => "updated successfully"])) : print_r(json_encode(["message" => "update faild"]));
             exit;
         }
-
-        $this->checkIfadmin($userId);
-        //
-        $sql = "UPDATE blog SET ";
-        foreach ($data as $col => $val) {
-            $sql .= "$col='$val', ";
+        
+        if (!isset($data['title'], $data['description'])) {
+            http_response_code(422);
+            echo json_encode(["message" => "All fields required"]);
+            exit;
         }
+        
+        $this->checkIfadmin($userId);
+
+        $img = isset($data["img"]) ? $data["img"] : "";
+
+        if (!empty($img)) {
+            $img = imgToUrl($img);
+        }
+        
+        $sql = "UPDATE blog SET ";
+
+        // Add variables to store title and description
+        $title = isset($data["title"]) ? $data["title"] : "";
+        $description = isset($data["description"]) ? $data["description"] : "";
+
+        // Append title and description to the SQL statement
+        if (!empty($title)) {
+            $sql .= "title='$title', ";
+        }
+
+        if (!empty($description)) {
+            $sql .= "description='$description', ";
+        }
+
+        if (is_array($data)) {  // Check if $data is an array
+            foreach ($data as $col => $val) {
+                // Skip the "img", "title", and "description" keys
+                if ($col !== "img" && $col !== "title" && $col !== "description") {
+                    $sql .= "$col='$val', ";
+                }
+            }
+        }
+
         $sql = rtrim($sql, ", ");
+
+        if ($img !== "") {
+            $sql .= ", img='$img' ";
+        }
+
         $sql .= " WHERE _idBlog = '$id';";
 
         //
@@ -117,7 +157,8 @@ class BlogGateway extends DataBase {
         mysqli_affected_rows($this->connection) > 0 ? print_r(json_encode(array("message" => "deleted successfully"))) : notFound();
     }
 
-    private function checkIfadmin($_idUser) {
+    private function checkIfadmin($_idUser)
+    {
         $sql = "SELECT _id , nameRole  FROM `user` INNER JOIN user_role USING(_idRole) WHERE _id = '$_idUser' AND nameRole = 'admin'";
         $data = $this->executeQuery($sql);
         if (mysqli_num_rows($data) === 0) {

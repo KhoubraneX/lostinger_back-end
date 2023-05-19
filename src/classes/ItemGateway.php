@@ -2,7 +2,8 @@
 class ItemGateway extends DataBase
 {
 
-    public function getItemsByid($userId) {
+    public function getItemsByid($userId)
+    {
         $data = $this->executeQuery("SELECT 
             _idItem, 
             _idUser, 
@@ -190,6 +191,22 @@ class ItemGateway extends DataBase
         print_r(json_encode($data));
     }
 
+    public function getItemById(string $id, string $userId)
+    {
+        $fetch = $this->executeQuery("select  *
+        FROM 
+          `item`
+      WHERE _idItem = '$id' and _idUser = '$userId'");
+        $data = $this->fetch($fetch);
+
+        mysqli_num_rows($fetch) === 0 && notFound();
+        if (isset($data['img']) && !empty($data['img'])) {
+            $data['img'] = "http://" . $_SERVER['HTTP_HOST'] . "/space/img/items/" . $data['img'];
+        }
+
+        print_r(json_encode($data));
+    }
+
     public function addItem($userId)
     {
         $data = json_decode(file_get_contents("php://input"), true);
@@ -221,7 +238,7 @@ class ItemGateway extends DataBase
         //
         $sql = "INSERT INTO item(_idItem , _idUser, nameItem, description, location, date, img , _idPlace, _idCategory, brand, _idType) 
                             VALUES ('$_idItem' , '$_idUser', '$nameItem', '$description', '$location', '$date', '$img' , '$_idPlace', '$_idCategory', '$brand', '$_idType')";
-        $res = $this->executeQuery($sql);
+        $this->executeQuery($sql);
         //
         mysqli_affected_rows($this->connection) > 0 ? print_r(json_encode(["id" => $_idItem, "message" => "success"])) : print_r(json_encode(["message" => "faild"]));
     }
@@ -256,16 +273,33 @@ class ItemGateway extends DataBase
             $this->checkItemData("A", "A", "A", "A", "01-10-1900", 0, 0, $data["_idType"]);
         }
         //
+
+        $img = isset($data["img"]) ? $data["img"] : "";
+
+        if (!empty($img)) {
+            $img = imgToUrl($img);
+        }
+
         $sql = "UPDATE item SET ";
         foreach ($data as $col => $val) {
-            $sql .= "$col='$val', ";
+            if ($col !== "img") {
+                $sql .= "$col='$val', ";
+            }
         }
         $sql = rtrim($sql, ", ");
-        $sql .= " WHERE _idItem = '$id' AND _idUser = '$userId';";
+        if ($img !== "") {
+            $sql .= ", img='$img' ";
+        }
+        $sql .= "WHERE _idItem = '$id' AND _idUser = '$userId';";
 
         //
         $this->executeQuery($sql);
-        mysqli_affected_rows($this->connection) > 0 ? print_r(json_encode(["id" => $id, "message" => "updated successfully"])) : print_r(json_encode(["message" => "update faild"]));
+        if (mysqli_affected_rows($this->connection) > 0) {
+            print_r(json_encode(["id" => $id, "message" => "Updated successfully"]));
+        } else {
+            print_r(json_encode(["message" => "No changes made"]));
+            http_response_code(204);
+        }
     }
 
     public function deleteItem(string $id, $userId)

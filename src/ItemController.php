@@ -33,7 +33,11 @@ class ItemController extends ItemGateway {
                     case 'GET':
                         if ($id === "search" && isset($_GET["city"])) {
                             $this->getItemsNear($_GET["city"]);
-                        } else {
+                        } else if (isset($_GET["target"]) && $_GET["target"] == "editMyItem") {
+                            $userId = checkAuth();
+                            $this->getItemById($id , $userId);
+                        }
+                        else {
                             $this->getItem($id);
                         }
                         break;
@@ -49,7 +53,7 @@ class ItemController extends ItemGateway {
                         break;
                     
                     default:
-                        notAllodMethods("GET , DELETE , PATCH , POST");
+                        notAllodMethods("GET , DELETE , PATCH");
                         break;
                 }
             }
