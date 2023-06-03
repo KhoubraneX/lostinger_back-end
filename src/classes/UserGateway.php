@@ -174,6 +174,52 @@
             $this->SendJwtByEmail($email);
         }
 
+        public function forgotPassword() {
+            $data = json_decode(file_get_contents("php://input") , true);
+
+            if (!isset($data['email'])){
+                $response = array(
+                    'status' => 'error',
+                    'message' => 'Email required'
+                );
+                echo json_encode($response);
+                http_response_code(400);
+                exit;
+            }
+
+            $email = htmlspecialchars($data["email"]);
+            
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $response = array(
+                    'status' => 'error',
+                    'message' => 'Invalid email format'
+                );
+                echo json_encode($response);
+                http_response_code(401);
+                exit;
+            }
+
+            $sql = "SELECT _id FROM user WHERE email = '$email'";
+            $user = $this->executeQuery($sql);
+
+            if (mysqli_num_rows($user) === 0) {
+                $response = array(
+                    'status' => 'error',
+                    'message' => "Your account is not exist."
+                );
+                echo json_encode($response);
+                http_response_code(401);
+                exit;
+            }
+
+            $resetToken = bin2hex(random_bytes(16));
+
+  // Send an email to the user with the password reset link
+  $resetLink = 'https://example.com/reset_password.php?token=' . $resetToken;
+
+            print_r(json_encode(["status" => "success"]));
+        }
+
 
         public function register() {
             

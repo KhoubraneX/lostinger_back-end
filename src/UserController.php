@@ -14,6 +14,9 @@ class UserController extends UserGateway
                 case 'logout':
                     $this->logout();
                     break;
+                case 'forgot_password':
+                    $this->forgotPassword();
+                    break;
                 case 'refresh':
                     $this->refreshAccessToken();
                     break;
